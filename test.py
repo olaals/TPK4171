@@ -1,18 +1,22 @@
+import robotics as rb
+import visualize as viz
+import vision as vsn
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-import utils as ut
-import math
 import numpy as np
 
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
 
-T = np.zeros((4,4))
 
-T[3,3] = 1.0
-R = ut.rotx(math.pi*1.1)
-T[0:3,0:3] = R
-t = np.array([1,1,1])
-T[0:3,3] = t
-print(T)
+viz.defaultAxisSetup(ax)
 
-T_inv = ut.invertTrans(T)
-print(T_inv)
+
+p1 = np.array([2.0, 4.0, 2.0, 1.0])
+p2 = np.array([2.0, 1.0, 2.0, 1.0])
+p4 = np.array([2.0, 4.0, 1.0, 1.0])
+p3 = np.array([2.0, 1.0, 1.0, 1.0])
+
+
+viz.plotPlaneFrom4Points(ax, p1, p2, p3, p4)
+
+plt.show()

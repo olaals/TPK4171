@@ -7,7 +7,7 @@ import robotics as rb
 import vision as vsn
 import visualize as viz
 
-fig = plt.figure()
+fig = plt.figure(figsize=(6,6))
 ax = fig.add_subplot(111, projection='3d')
 
 viz.defaultAxisSetup(ax)
@@ -16,10 +16,10 @@ R = rb.roty(math.pi/2.0) @ rb.rotz(-math.pi/2.0)
 print(R)
 
 
-line1 = vsn.Line(ax, [6,3,0], [6,3,2])
-line2 = vsn.Line(ax, [6,3,2], [7,4,2])
-line3 = vsn.Line(ax, [7,4,2], [7,4,0])
-line4 = vsn.Line(ax, [7,4,0], [6,3,0])
+line1 = vsn.Line(ax, [6,3,0], [6,3,2], color = np.array([255, 0, 0]))
+line2 = vsn.Line(ax, [6,3,2], [7,4,2], color = np.array([0, 255, 0]))
+line3 = vsn.Line(ax, [7,4,2], [7,4,0], color = np.array([0,0,255]))
+line4 = vsn.Line(ax, [7,4,0], [6,3,0], color = np.array([255,0, 255]))
 
 
 print(R)
@@ -34,6 +34,7 @@ intrinsic = np.array([[1500, 0, 640], [0, 1500, 512], [0,0,1]])
 cam1 = vsn.Camera(ax, R, t, intrinsic,name = "c")
 cam1.drawBody()
 cam1.takePicture([line1, line2, line3, line4])
+cam1.showNormalizedImagePlane(ax)
 
 #ax.scatter(2,2,2)
 

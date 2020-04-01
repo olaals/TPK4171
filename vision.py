@@ -10,13 +10,64 @@ import cv2
 import robotics as rb
 import visualize as viz
 
+def recoverFromEssential(E):
+    W = np.array([[0.0, -1.0, 0.0], [1.0, 0.0, 0.0], [.0, .0, 1.0]])
+    print("W")
+    print(W)
+    Z = np.array([[.0, 1.0, .0], [-1.0, .0, .0], [.0, .0, .0]])
+    print("Z")
+    print(Z)
 
+    U, S, VT = np.linalg.svd(E)
+    print("U")
+    print(U)
+    print("S")
+    S = np.diag(S)
+    print(S)
+    print("VT")
+    print(VT)
+
+    R1 = U @ W @ VT
+    R2 = U @ np.transpose(W) @ VT
+
+    if np.linalg.det(R1) < 0:
+        R1 = -R1
+    
+    if np.linalg.det(R2) < 0:
+        R2 = -R2
+
+    print("R1")
+    print(R1)
+
+    print("R2")
+    print(R2)
+
+    tc = U @ Z @ np.transpose(U)
+    print("tc")
+    print(tc)
+
+    t1 = np.array([tc[2,1], tc[0,2], tc[1,0]])
+    print("t1")
+    print(t1)
+    t2 = -t1
+
+    return R1, R2, t1, t2
 
 class Line:
-    def __init__(self, ax, start, end):
+    def __init__(self, ax, start, end, color = np.array([255,0,0])):
+        self.color = color
         self.start = start
         self.end = end
-        ax.plot([start[0], end[0]], [start[1], end[1]], [start[2], end[2]])
+        color = color/255.0
+        ax.plot([start[0], end[0]], [start[1], end[1]], [start[2], end[2]], color = color)
+
+class Frame2D:
+    def __init__(self, ax, R, t):
+        pass
+
+    def drawFrame(self, ax):
+        pass
+
 
 
 class Frame:
@@ -58,14 +109,14 @@ class Frame:
 
         
 class Camera(Frame):
-    def __init__(self, ax, R, t, intrinsic, name = ""):
+    def __init__(self, ax, R = np.diag(np.ones((3))), t = np.zeros((3)), intrinsic = np.ones((3,3)), name = ""):
         Frame.__init__(self, ax, R, t, name)
         self.K = intrinsic
         self.inv_K = self.invert_intrinsic(intrinsic)
         self.ax = ax
         self.img_width = self.K[0, 2] * 2
         self.img_height = self.K[1, 2] * 2
-
+        self.drawBody()
 
     def takePicture(self, lines):
         width = self.K[0, 2] * 2
@@ -97,9 +148,10 @@ class Camera(Frame):
             point = np.array([xs[i], ys[i], zs[i], 1.0])
             (py, px) = self.getPixelOfPoint(point)
             if(py>=0 and py < self.img_height and px >= 0 and px < self.img_width):
-                img[py,px,:] = 0
+                img[py,px] = line.color
+
                 
-        
+        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         cv2.imshow( "pic", img)
 
 
@@ -128,24 +180,34 @@ class Camera(Frame):
         inv_K[1,2] = -K[1,2]
         return inv_K
 
+    def showNormalizedImagePlane(self, ax):
+        p1 = self.T @ np.array([1.0, 1.0, 1.0, 1.0])
+        p2 = self.T @ np.array([1.0, -1.0, 1.0, 1.0])
+        p3 = self.T @ np.array([-1.0, -1.0, 1.0, 1.0])
+        p4 = self.T @ np.array([-1.0, 1.0, 1.0, 1.0])
+
+        viz.plotPlaneFrom4Points(ax, p1, p2, p3, p4, color = 'r')
+
+    
+
     def drawBody(self):
         ax = self.ax
 
-        p1 = np.array([0.5, 0.5, 0.5, 1.0])
-        p2 = np.array([0.5, -0.5, 0.5, 1.0])
-        p3 = np.array([-0.5, -0.5, 0.5, 1.0])
-        p4 = np.array([-0.5, 0.5, 0.5, 1.0])
+        p1 = np.array([0.5, 0.5, 0.0, 1.0])
+        p2 = np.array([0.5, -0.5, 0.0, 1.0])
+        p3 = np.array([-0.5, -0.5, 0.0, 1.0])
+        p4 = np.array([-0.5, 0.5, 0.0, 1.0])
         
-        p5 = np.array([0.5, 0.5, -0.5, 1.0])
-        p6 = np.array([0.5, -0.5, -0.5, 1.0])
-        p7 = np.array([-0.5, -0.5, -0.5, 1.0])
-        p8 = np.array([-0.5, 0.5, -0.5, 1.0])
+        p5 = np.array([0.5, 0.5, -1.0, 1.0])
+        p6 = np.array([0.5, -0.5, -1.0, 1.0])
+        p7 = np.array([-0.5, -0.5, -1.0, 1.0])
+        p8 = np.array([-0.5, 0.5, -1.0, 1.0])
 
-        p9 = np.array([0.0, 0.0, 0.5, 1.0])
-        p10 = np.array([0.5, 0.5, 1.0, 1.0])
-        p11 = np.array([0.5, -0.5, 1.0, 1.0])
-        p12 = np.array([-0.5, -0.5, 1.0, 1.0])
-        p13 = np.array([-0.5, 0.5, 1.0, 1.0])
+        p9 = np.array([0.0, 0.0, 0.0, 1.0])
+        p10 = np.array([0.5, 0.5, 0.5, 1.0])
+        p11 = np.array([0.5, -0.5, 0.5, 1.0])
+        p12 = np.array([-0.5, -0.5, 0.5, 1.0])
+        p13 = np.array([-0.5, 0.5, 0.5, 1.0])
 
 
         p1_s = self.T @ p1
