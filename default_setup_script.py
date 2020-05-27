@@ -1,6 +1,6 @@
-import robotics as rb
-import visualize as viz
-import vision as vsn
+import module_oa.robotics as rb
+import module_oa.visualize as viz
+import module_oa.vision as vsn
 import matplotlib.pyplot as plt
 import numpy as np
 
