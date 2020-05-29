@@ -7,7 +7,7 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import scipy as sp
 import matplotlib.colors as colors
 import cv2
-import module_oa.robotics as rb
+import robotics as rb
 
 
 

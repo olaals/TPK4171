@@ -7,8 +7,8 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import scipy as sp
 import matplotlib.colors as colors
 import cv2
-import module_oa.robotics as rb
-import module_oa.visualize as viz
+import robotics as rb
+import visualize as viz
 
 def recoverFromEssential(E):
     W = np.array([[0.0, -1.0, 0.0], [1.0, 0.0, 0.0], [.0, .0, 1.0]])

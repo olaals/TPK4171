@@ -1,3 +1,4 @@
+import addPathToModules
 import robotics as rb
 import visualize as viz
 import vision as vsn
